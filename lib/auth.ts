@@ -7,8 +7,13 @@ const SESSION_TTL = "8h";
 
 function getSecret() {
   const secret = process.env.SESSION_SECRET;
-  if (!secret) throw new Error("SESSION_SECRET is not configured");
-  return new TextEncoder().encode(secret);
+  if (secret) return new TextEncoder().encode(secret);
+  // Dev-only fallback so the app runs without configuration. Set SESSION_SECRET
+  // to a strong random value in production.
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET is not configured");
+  }
+  return new TextEncoder().encode("dev-insecure-secret-change-me");
 }
 
 export function sha256(input: string): string {

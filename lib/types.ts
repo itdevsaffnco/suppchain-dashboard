@@ -11,6 +11,7 @@ export interface SessionUser {
 export interface AppUser {
   id: string;
   username: string;
+  email: string;
   role: Role;
   status: UserStatus;
 }
