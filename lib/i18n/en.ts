@@ -1,5 +1,5 @@
 const en = {
-  login_title: "Enterprise SCM",
+  login_title: "Supply Chain Dashboard",
   login_desc: "Supply Chain Management System",
   username_label: "Username",
   username_or_email_label: "Username or Email",

@@ -544,12 +544,64 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
     [categoryNames, t]
   );
 
+  // ---- Pagination (applies to every data page, not the dashboard) ----
+  const ROWS_PER_PAGE = 12;
+  const [weeklyPage, setWeeklyPage] = useState(1);
+  const [healthPage, setHealthPage] = useState(1);
+  const [agingPage, setAgingPage] = useState(1);
+
+  const weeklyItems = useMemo(() => {
+    const term = weeklySearch.toLowerCase();
+    const items: { sku: EnrichedSku; w: number }[] = [];
+    enriched.forEach((sku) => {
+      if ((weeklyCat !== "ALL" && sku.cat !== weeklyCat) || (!sku.name.toLowerCase().includes(term) && !sku.cat.toLowerCase().includes(term))) return;
+      WEEKS.forEach((w) => {
+        if (sku.f_trend[w] === 0 && sku.r_trend[w] === 0) return;
+        items.push({ sku, w });
+      });
+    });
+    return items;
+  }, [enriched, weeklySearch, weeklyCat]);
+
+  const healthItems = useMemo(
+    () => enriched.filter((s) => (healthCat === "ALL" || s.cat === healthCat) && (healthStatus === "ALL" || s.status === healthStatus)),
+    [enriched, healthCat, healthStatus]
+  );
+
+  const agingItems = useMemo(() => {
+    const term = agingSearch.toLowerCase();
+    return enriched.filter(
+      (s) => !((agingCat !== "ALL" && s.cat !== agingCat) || (agingStatus !== "ALL" && s.status_aging !== agingStatus) || (!s.name.toLowerCase().includes(term) && !s.cat.toLowerCase().includes(term)))
+    );
+  }, [enriched, agingSearch, agingCat, agingStatus]);
+
+  // Reset to the first page whenever a filter/search narrows the list
+  useEffect(() => setWeeklyPage(1), [weeklySearch, weeklyCat]);
+  useEffect(() => setHealthPage(1), [healthCat, healthStatus]);
+  useEffect(() => setAgingPage(1), [agingSearch, agingCat, agingStatus]);
+
   const DateBadge = () => (
     <div className="date-badge" style={{ padding: "6px 14px" }}>
       <i className="ph-fill ph-calendar-blank" style={{ color: "var(--brand-primary)", fontSize: "1.1rem" }} />
       <input type="date" className="header-date-picker" value={globalDate} onChange={(e) => setGlobalDate(e.target.value)} />
     </div>
   );
+
+  // Clamp each page to its valid range and slice the visible rows
+  const weeklyTotalPages = Math.max(1, Math.ceil(weeklyItems.length / ROWS_PER_PAGE));
+  const weeklyPageSafe = Math.min(weeklyPage, weeklyTotalPages);
+  const weeklyStart = (weeklyPageSafe - 1) * ROWS_PER_PAGE;
+  const weeklyPaged = weeklyItems.slice(weeklyStart, weeklyStart + ROWS_PER_PAGE);
+
+  const healthTotalPages = Math.max(1, Math.ceil(healthItems.length / ROWS_PER_PAGE));
+  const healthPageSafe = Math.min(healthPage, healthTotalPages);
+  const healthStart = (healthPageSafe - 1) * ROWS_PER_PAGE;
+  const healthPaged = healthItems.slice(healthStart, healthStart + ROWS_PER_PAGE);
+
+  const agingTotalPages = Math.max(1, Math.ceil(agingItems.length / ROWS_PER_PAGE));
+  const agingPageSafe = Math.min(agingPage, agingTotalPages);
+  const agingStart = (agingPageSafe - 1) * ROWS_PER_PAGE;
+  const agingPaged = agingItems.slice(agingStart, agingStart + ROWS_PER_PAGE);
 
   // ======================================================================
   // Render
@@ -634,7 +686,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
 
       {/* Sidebar */}
       <div className="sidebar">
-        <div className="brand"><i className="ph-fill ph-compass" /> <span className="side-label">Enterprise SCM</span></div>
+        <div className="brand"><i className="ph-fill ph-compass" /> <span className="side-label">Supply Chain Dashboard</span></div>
         <div className="nav-section-label">{t("menu_label")}</div>
         <div className={`nav-item ${tab === "dashboard" ? "active" : ""}`} onClick={() => setTab("dashboard")}><i className="ph ph-chart-line" /> <span>{t("nav_dashboard")}</span></div>
         <div className={`nav-item ${tab === "weekly" ? "active" : ""}`} onClick={() => setTab("weekly")}><i className="ph ph-calendar" /> <span>{t("nav_weekly")}</span></div>
@@ -792,7 +844,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 <button className="btn btn-primary" onClick={exportWeekly}><i className="ph ph-download-simple" /> <span>{t("btn_export")}</span></button>
               </div>
             </div>
-            <div className="table-responsive" style={{ maxHeight: 600, overflowY: "auto" }}>
+            <div className="table-responsive">
               <table className="modern-data-table">
                 <thead><tr>
                   <th>{t("tbl_no")}</th><th>{t("tbl_sku")}</th>
@@ -800,32 +852,21 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                   <th>{t("tbl_week")}</th><th>{t("tbl_forecast_qty")}</th><th>{t("tbl_realization_qty")}</th><th style={{ textAlign: "center" }}>{t("tbl_action")}</th>
                 </tr></thead>
                 <tbody>
-                  {(() => {
-                    const rows: React.ReactNode[] = [];
-                    let counter = 1;
-                    const term = weeklySearch.toLowerCase();
-                    enriched.forEach((sku) => {
-                      if ((weeklyCat !== "ALL" && sku.cat !== weeklyCat) || (!sku.name.toLowerCase().includes(term) && !sku.cat.toLowerCase().includes(term))) return;
-                      WEEKS.forEach((w) => {
-                        if (sku.f_trend[w] === 0 && sku.r_trend[w] === 0) return;
-                        rows.push(
-                          <tr key={sku.name + w}>
-                            <td>{counter++}</td>
-                            <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(sku)}>{sku.name}</button></td>
-                            <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{sku.cat}</span></td>
-                            <td style={{ textAlign: "center" }}><span className="week-badge">W{w + 1}</span></td>
-                            <td className="qty-cell">{nf(sku.f_trend[w])}</td>
-                            <td className="qty-cell" style={{ color: "var(--brand-primary)" }}>{nf(sku.r_trend[w])}</td>
-                            <td style={{ textAlign: "center" }}><button className="btn-icon danger" onClick={() => deleteWeekly(sku.name, w)} title="Clear Weekly Data"><i className="ph ph-trash" /></button></td>
-                          </tr>
-                        );
-                      });
-                    });
-                    return rows;
-                  })()}
+                  {weeklyPaged.map(({ sku, w }, i) => (
+                    <tr key={sku.name + w}>
+                      <td>{weeklyStart + i + 1}</td>
+                      <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(sku)}>{sku.name}</button></td>
+                      <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{sku.cat}</span></td>
+                      <td style={{ textAlign: "center" }}><span className="week-badge">W{w + 1}</span></td>
+                      <td className="qty-cell">{nf(sku.f_trend[w])}</td>
+                      <td className="qty-cell" style={{ color: "var(--brand-primary)" }}>{nf(sku.r_trend[w])}</td>
+                      <td style={{ textAlign: "center" }}><button className="btn-icon danger" onClick={() => deleteWeekly(sku.name, w)} title="Clear Weekly Data"><i className="ph ph-trash" /></button></td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <TablePager page={weeklyPageSafe} totalPages={weeklyTotalPages} total={weeklyItems.length} start={weeklyStart} count={weeklyPaged.length} onPage={setWeeklyPage} />
           </div>
         </div>
 
@@ -841,7 +882,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 <button className="btn btn-primary" onClick={exportStock}><i className="ph ph-download-simple" /> <span>{t("btn_export")}</span></button>
               </div>
             </div>
-            <div className="table-responsive" style={{ maxHeight: 600, overflowY: "auto" }}>
+            <div className="table-responsive">
               <table className="modern-data-table" style={{ marginBottom: 0, minWidth: 900 }}>
                 <thead><tr>
                   <th>{t("tbl_list_sku")}</th>
@@ -851,7 +892,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                   <th style={{ textAlign: "center", minWidth: 90 }}>{t("tbl_action")}</th>
                 </tr></thead>
                 <tbody>
-                  {enriched.filter((s) => (healthCat === "ALL" || s.cat === healthCat) && (healthStatus === "ALL" || s.status === healthStatus)).map((s) => {
+                  {healthPaged.map((s) => {
                     const pill = s.status === "Shortage" ? "pill-kurang" : s.status === "Excess" ? "pill-over" : "pill-cukup";
                     return (
                       <tr key={s.name}>
@@ -866,6 +907,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 </tbody>
               </table>
             </div>
+            <TablePager page={healthPageSafe} totalPages={healthTotalPages} total={healthItems.length} start={healthStart} count={healthPaged.length} onPage={setHealthPage} />
           </div>
         </div>
 
@@ -887,7 +929,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 <button className="btn btn-primary" onClick={exportAging}><i className="ph ph-download-simple" /> <span>{t("btn_export")}</span></button>
               </div>
             </div>
-            <div className="table-responsive" style={{ maxHeight: 600, overflowY: "auto" }}>
+            <div className="table-responsive">
               <table className="modern-data-table">
                 <thead><tr>
                   <th>{t("tbl_no")}</th><th>{t("tbl_sku")}</th>
@@ -897,39 +939,33 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                   <th>{t("tbl_variance")}</th><th style={{ textAlign: "center" }}>{t("tbl_action")}</th>
                 </tr></thead>
                 <tbody>
-                  {(() => {
-                    const rows: React.ReactNode[] = [];
-                    let counter = 1;
-                    const term = agingSearch.toLowerCase();
-                    enriched.forEach((s) => {
-                      if ((agingCat !== "ALL" && s.cat !== agingCat) || (agingStatus !== "ALL" && s.status_aging !== agingStatus) || (!s.name.toLowerCase().includes(term) && !s.cat.toLowerCase().includes(term))) return;
-                      const dateStr = s.oldest_batch_date ? new Date(s.oldest_batch_date).toLocaleDateString("en-GB") : "-";
-                      const sign = s.selisih_target > 0 ? "+" : "";
-                      rows.push(
-                        <tr key={s.name}>
-                          <td>{counter++}</td>
-                          <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
-                          <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.cat}</span></td>
-                          <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.tipe_stock || "Reguler"}</span></td>
-                          <td className="qty-cell">{nf(s.stock)}</td>
-                          <td style={{ textAlign: "center" }}>{dateStr}</td>
-                          <td style={{ textAlign: "right", fontWeight: 800 }}>{s.aging}</td>
-                          <td style={{ textAlign: "center" }}><span className="week-badge">{s.kategori_aging}</span></td>
-                          <td style={{ textAlign: "right" }}>{s.target_simpan}</td>
-                          <td><span className={`status-pill ${s.aging_class}`}>{t(s.status_aging.toLowerCase() as keyof Dict)}</span></td>
-                          <td style={{ textAlign: "right", color: s.selisih_target > 0 ? "var(--brand-red)" : "var(--brand-green)", fontWeight: 700 }}>{sign}{s.selisih_target}</td>
-                          <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                            <button className="btn-outline" style={{ padding: "6px 12px", fontSize: "0.75rem", borderRadius: 8 }} onClick={() => setBatchSku(s.name)}><i className="ph ph-list-dashes" /> {t("view_batches")}</button>{" "}
-                            <button className="btn-icon danger" onClick={() => deleteSku(s.name)} title="Delete SKU"><i className="ph ph-trash" /></button>
-                          </td>
-                        </tr>
-                      );
-                    });
-                    return rows;
-                  })()}
+                  {agingPaged.map((s, i) => {
+                    const dateStr = s.oldest_batch_date ? new Date(s.oldest_batch_date).toLocaleDateString("en-GB") : "-";
+                    const sign = s.selisih_target > 0 ? "+" : "";
+                    return (
+                      <tr key={s.name}>
+                        <td>{agingStart + i + 1}</td>
+                        <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
+                        <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.cat}</span></td>
+                        <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.tipe_stock || "Reguler"}</span></td>
+                        <td className="qty-cell">{nf(s.stock)}</td>
+                        <td style={{ textAlign: "center" }}>{dateStr}</td>
+                        <td style={{ textAlign: "right", fontWeight: 800 }}>{s.aging}</td>
+                        <td style={{ textAlign: "center" }}><span className="week-badge">{s.kategori_aging}</span></td>
+                        <td style={{ textAlign: "right" }}>{s.target_simpan}</td>
+                        <td><span className={`status-pill ${s.aging_class}`}>{t(s.status_aging.toLowerCase() as keyof Dict)}</span></td>
+                        <td style={{ textAlign: "right", color: s.selisih_target > 0 ? "var(--brand-red)" : "var(--brand-green)", fontWeight: 700 }}>{sign}{s.selisih_target}</td>
+                        <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                          <button className="btn-outline" style={{ padding: "6px 12px", fontSize: "0.75rem", borderRadius: 8 }} onClick={() => setBatchSku(s.name)}><i className="ph ph-list-dashes" /> {t("view_batches")}</button>{" "}
+                          <button className="btn-icon danger" onClick={() => deleteSku(s.name)} title="Delete SKU"><i className="ph ph-trash" /></button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
+            <TablePager page={agingPageSafe} totalPages={agingTotalPages} total={agingItems.length} start={agingStart} count={agingPaged.length} onPage={setAgingPage} />
           </div>
         </div>
 
@@ -1045,6 +1081,39 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
 // ---------------------------------------------------------------------------
 // SKU detail modal
 // ---------------------------------------------------------------------------
+function TablePager({ page, totalPages, total, start, count, onPage }: { page: number; totalPages: number; total: number; start: number; count: number; onPage: (p: number) => void }) {
+  if (total === 0) return null;
+  // Build a compact window of page numbers with ellipses for large sets
+  const nums: (number | "…")[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) nums.push(i);
+  } else {
+    const left = Math.max(2, page - 1);
+    const right = Math.min(totalPages - 1, page + 1);
+    nums.push(1);
+    if (left > 2) nums.push("…");
+    for (let i = left; i <= right; i++) nums.push(i);
+    if (right < totalPages - 1) nums.push("…");
+    nums.push(totalPages);
+  }
+  return (
+    <div className="table-pager">
+      <span className="pager-info">{start + 1}–{start + count} / {total}</span>
+      <div className="pager-controls">
+        <button className="pager-btn" disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Previous page"><i className="ph-bold ph-caret-left" /></button>
+        {nums.map((n, i) =>
+          n === "…" ? (
+            <span key={`e${i}`} className="pager-ellipsis">…</span>
+          ) : (
+            <button key={n} className={`pager-btn ${n === page ? "active" : ""}`} onClick={() => onPage(n)}>{n}</button>
+          )
+        )}
+        <button className="pager-btn" disabled={page >= totalPages} onClick={() => onPage(page + 1)} aria-label="Next page"><i className="ph-bold ph-caret-right" /></button>
+      </div>
+    </div>
+  );
+}
+
 function Row({ label, value, valueColor }: { label: string; value: React.ReactNode; valueColor?: string }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", borderBottom: "1px solid var(--border-color)", paddingBottom: 4 }}>

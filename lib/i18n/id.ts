@@ -1,7 +1,7 @@
 import type { Dict } from "./en";
 
 const id: Dict = {
-  login_title: "Enterprise SCM",
+  login_title: "Supply Chain Dashboard",
   login_desc: "Sistem Manajemen Rantai Pasok",
   username_label: "Nama Pengguna",
   username_or_email_label: "Nama Pengguna atau Email",

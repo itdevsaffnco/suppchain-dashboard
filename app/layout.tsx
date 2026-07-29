@@ -22,7 +22,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Enterprise SCM Dashboard",
+  title: "Supply Chain Dashboard",
   description: "Supply Chain Management System — forecast, stock health & aging analytics.",
 };
 

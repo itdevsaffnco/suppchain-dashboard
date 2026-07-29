@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Supply Chain Dashboard
 
-## Getting Started
+Dashboard SCM (forecast & realization, stock health, aging stock) berbasis
+**Next.js 16 + React 19 + Chart.js**. Saat ini berjalan dengan **seed data**
+(in-memory); backend Google Apps Script/Sheets menyusul.
 
-First, run the development server:
+## Menjalankan
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev     # development → http://localhost:3000
+npm run build   # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Akun demo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Username   | Email                  | Role  |
+|------------|------------------------|-------|
+| `admin_sc` | admin@saffnco.com      | Admin |
+| `staff_wh` | staff.wh@saffnco.com   | User  |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Login bisa pakai **username atau email**. Mode demo: password bebas sampai user
+melakukan reset/ubah password (setelah itu password tersimpan di memori server
+sampai restart).
 
-## Learn More
+## Peta direktori — mau ubah apa, ke mana?
 
-To learn more about Next.js, take a look at the following resources:
+| Mau ubah…                                    | Edit file                                   |
+|----------------------------------------------|---------------------------------------------|
+| **Teks / label / terjemahan** (semua tulisan di UI) | `lib/i18n/en.ts` + `lib/i18n/id.ts`  |
+| Judul tab browser & font                     | `app/layout.tsx`                            |
+| **Warna, tema, transisi, style UI** (CSS)    | `app/globals.css`                           |
+| Warna & palet **chart** per tema             | `lib/chartThemes.ts`                        |
+| Komponen chart (bar/line/doughnut)           | `components/charts.tsx`                     |
+| **Halaman utama / semua tab UI** (login, dashboard, tabel, modal, settings) | `components/Dashboard.tsx` |
+| Halaman reset password (dari link email)     | `app/reset-password/` + `components/ResetPasswordForm.tsx` |
+| Animasi background (logistics network)       | `components/LiveWallpaper.tsx`              |
+| **Seed data** (SKU, kategori, user awal)     | `lib/dashboard.ts`                          |
+| Login / logout / session (server)            | `app/api/login/`, `app/api/logout/`, `lib/auth.ts`, `lib/session.ts` |
+| Forgot/reset password (server)               | `app/api/forgot-password/`, `app/api/reset-password/` |
+| User management (server, simpan user & password) | `app/api/users/`, `lib/userStore.ts`    |
+| Pengiriman email reset (SMTP)                | `lib/mailer.ts`                             |
+| Perhitungan KPI / status stok / aging        | `lib/dashboard.ts` (fungsi enrich/recalc), `lib/recalc.ts` |
+| Import/export CSV                            | `lib/csv.ts`                                |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Struktur singkat
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/            Routes Next.js (App Router)
+  page.tsx        Halaman utama → render components/Dashboard.tsx
+  layout.tsx      Root layout: font, judul tab, ikon
+  globals.css     SELURUH styling & tema (design tokens di bagian atas)
+  reset-password/ Halaman "buat password baru" dari link email
+  api/            Route handler server (login, users, forgot-password, dll.)
+components/     Komponen React (Dashboard.tsx = hampir seluruh UI)
+lib/            Logika & data (i18n, seed data, auth, user store, chart themes)
+apps-script/    Code.gs untuk backend Google Apps Script (BELUM dipakai —
+                di-deploy ke Google nanti; set APPS_SCRIPT_URL untuk mengaktifkan)
+legacy/         File lama yang TIDAK dipakai app (index.html standalone)
+public/         Aset statis
+```
 
-## Deploy on Vercel
+> ⚠️ Mengubah `legacy/index.html` atau `apps-script/Code.gs` **tidak mengubah
+> tampilan di localhost** — semua UI berasal dari `components/` + `lib/i18n/`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Konfigurasi (env)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Variabel | Fungsi |
+|---|---|
+| `SESSION_SECRET` | Wajib di production — secret JWT session |
+| `APPS_SCRIPT_URL` | Jika diset, login & data diambil dari backend Apps Script |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Pengiriman email reset password. Tanpa ini, link reset ditampilkan di UI/console (mode demo) |

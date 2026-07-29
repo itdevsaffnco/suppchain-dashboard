@@ -31,12 +31,12 @@ export async function sendResetEmail(to: string, resetUrl: string): Promise<Send
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to,
-    subject: "Reset Password — Enterprise SCM Dashboard",
+    subject: "Reset Password — Supply Chain Dashboard",
     text: `Kami menerima permintaan reset password untuk akun Anda.\n\nBuka tautan berikut untuk membuat password baru (berlaku 30 menit):\n${resetUrl}\n\nJika Anda tidak meminta reset password, abaikan email ini.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h2 style="color: #1E3A8A; margin-bottom: 8px;">Reset Password</h2>
-        <p style="color: #334155;">Kami menerima permintaan reset password untuk akun Anda di Enterprise SCM Dashboard.</p>
+        <p style="color: #334155;">Kami menerima permintaan reset password untuk akun Anda di Supply Chain Dashboard.</p>
         <p style="margin: 24px 0;">
           <a href="${resetUrl}" style="background: #1E3A8A; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Buat Password Baru</a>
         </p>
