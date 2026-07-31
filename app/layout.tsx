@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, DM_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Special_Gothic, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-// Display font — headings, brand, KPI values
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-display",
+// Primary typeface — one grotesque across headings and UI text.
+// Loaded as a variable font so weight (400–700) and width (75–125) can be
+// dialled in from globals.css instead of snapping to preset cuts.
+const specialGothic = Special_Gothic({
+  variable: "--font-gothic",
   subsets: ["latin"],
-});
-
-// Body font — UI text, tables, forms
-const dmSans = DM_Sans({
-  variable: "--font-sans",
-  subsets: ["latin"],
+  axes: ["wdth"],
+  display: "swap",
+  fallback: ["Archivo", "Inter", "system-ui", "sans-serif"],
 });
 
 // Mono font — numeric/quantity cells
@@ -32,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${dmSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${specialGothic.variable} ${plexMono.variable}`}>
       <head>
         {/* Phosphor icon font — regular, bold & fill weights used across the UI */}
         <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />

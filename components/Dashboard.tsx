@@ -627,7 +627,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
           <div className="modal-header" style={{ justifyContent: "center", borderBottom: "none", marginBottom: 8 }}>
             <div className="modal-title" style={{ fontSize: "1.25rem" }}>{confirmState.title}</div>
           </div>
-          <p style={{ color: "var(--text-muted)", marginBottom: 24, fontWeight: 500, fontSize: "0.95rem" }}>{confirmState.message}</p>
+          <p style={{ color: "var(--text-muted)", marginBottom: 24, fontWeight: "var(--fw-medium)", fontSize: "0.95rem" }}>{confirmState.message}</p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%" }}>
             <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => closeConfirm(false)}>{t("cancel")}</button>
             <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => closeConfirm(true)}>{t("proceed")}</button>
@@ -786,7 +786,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
           </div>
 
           <div className="card-header" style={{ marginTop: 32, marginBottom: 16, borderBottom: "2px solid var(--border-color)", paddingBottom: 8 }}>
-            <span style={{ fontSize: "1.1rem", fontWeight: 800, display: "flex", alignItems: "center", gap: 8, color: "var(--brand-primary)" }}><i className="ph-bold ph-chart-bar" /> <span>{t("aging_analytics")}</span></span>
+            <span style={{ fontSize: "1.1rem", fontWeight: "var(--fw-strong)", display: "flex", alignItems: "center", gap: 8, color: "var(--brand-primary)" }}><i className="ph-bold ph-chart-bar" /> <span>{t("aging_analytics")}</span></span>
           </div>
           <div className="extra-charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
             <div className="card">
@@ -807,7 +807,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
 
           <div className="summary-grid">
             <div className="summary-panel danger">
-              <div className="card-header" style={{ marginBottom: 12, paddingBottom: 12 }}><span style={{ color: "var(--brand-red)", fontWeight: 800 }}><i className="ph-fill ph-warning-octagon" /> <span>{t("top_shortage")}</span></span></div>
+              <div className="card-header" style={{ marginBottom: 12, paddingBottom: 12 }}><span style={{ color: "var(--brand-red)", fontWeight: "var(--fw-strong)" }}><i className="ph-fill ph-warning-octagon" /> <span>{t("top_shortage")}</span></span></div>
               <ul className="summary-list">
                 {summary.shortage.length ? summary.shortage.map((s) => (
                   <li className="summary-item" key={s.name}>
@@ -818,7 +818,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
               </ul>
             </div>
             <div className="summary-panel warning">
-              <div className="card-header" style={{ marginBottom: 12, paddingBottom: 12 }}><span style={{ color: "var(--brand-orange)", fontWeight: 800 }}><i className="ph-fill ph-archive-box" /> <span>{t("top_overstock")}</span></span></div>
+              <div className="card-header" style={{ marginBottom: 12, paddingBottom: 12 }}><span style={{ color: "var(--brand-orange)", fontWeight: "var(--fw-strong)" }}><i className="ph-fill ph-archive-box" /> <span>{t("top_overstock")}</span></span></div>
               <ul className="summary-list">
                 {summary.overstock.length ? summary.overstock.map((s) => (
                   <li className="summary-item" key={s.name}>
@@ -855,7 +855,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                   {weeklyPaged.map(({ sku, w }, i) => (
                     <tr key={sku.name + w}>
                       <td>{weeklyStart + i + 1}</td>
-                      <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(sku)}>{sku.name}</button></td>
+                      <td style={{ fontWeight: "var(--fw-bold)" }}><button className="clickable-sku" onClick={() => setSkuView(sku)}>{sku.name}</button></td>
                       <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{sku.cat}</span></td>
                       <td style={{ textAlign: "center" }}><span className="week-badge">W{w + 1}</span></td>
                       <td className="qty-cell">{nf(sku.f_trend[w])}</td>
@@ -896,7 +896,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                     const pill = s.status === "Shortage" ? "pill-kurang" : s.status === "Excess" ? "pill-over" : "pill-cukup";
                     return (
                       <tr key={s.name}>
-                        <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
+                        <td style={{ fontWeight: "var(--fw-bold)" }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
                         <td style={{ color: "var(--text-muted)" }}>{s.cat}</td>
                         <td>{nf(s.stock)}</td><td>{nf(s.po)}</td><td>{nf(s.safety)}</td><td>{s.coverage} {t("days")}</td>
                         <td><span className={`status-pill ${pill}`}>{s.status}</span></td>
@@ -945,16 +945,16 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                     return (
                       <tr key={s.name}>
                         <td>{agingStart + i + 1}</td>
-                        <td style={{ fontWeight: 700 }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
+                        <td style={{ fontWeight: "var(--fw-bold)" }}><button className="clickable-sku" onClick={() => setSkuView(s)}>{s.name}</button></td>
                         <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.cat}</span></td>
                         <td><span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{s.tipe_stock || "Reguler"}</span></td>
                         <td className="qty-cell">{nf(s.stock)}</td>
                         <td style={{ textAlign: "center" }}>{dateStr}</td>
-                        <td style={{ textAlign: "right", fontWeight: 800 }}>{s.aging}</td>
+                        <td style={{ textAlign: "right", fontWeight: "var(--fw-strong)" }}>{s.aging}</td>
                         <td style={{ textAlign: "center" }}><span className="week-badge">{s.kategori_aging}</span></td>
                         <td style={{ textAlign: "right" }}>{s.target_simpan}</td>
                         <td><span className={`status-pill ${s.aging_class}`}>{t(s.status_aging.toLowerCase() as keyof Dict)}</span></td>
-                        <td style={{ textAlign: "right", color: s.selisih_target > 0 ? "var(--brand-red)" : "var(--brand-green)", fontWeight: 700 }}>{sign}{s.selisih_target}</td>
+                        <td style={{ textAlign: "right", color: s.selisih_target > 0 ? "var(--brand-red)" : "var(--brand-green)", fontWeight: "var(--fw-bold)" }}>{sign}{s.selisih_target}</td>
                         <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                           <button className="btn-outline" style={{ padding: "6px 12px", fontSize: "0.75rem", borderRadius: 8 }} onClick={() => setBatchSku(s.name)}><i className="ph ph-list-dashes" /> {t("view_batches")}</button>{" "}
                           <button className="btn-icon danger" onClick={() => deleteSku(s.name)} title="Delete SKU"><i className="ph ph-trash" /></button>
@@ -1025,8 +1025,8 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                     <tbody>
                       {data?.users.map((u) => (
                         <tr key={u.id}>
-                          <td style={{ textAlign: "center", fontWeight: 700 }}>#{u.id}</td>
-                          <td style={{ fontWeight: 700, color: "var(--brand-primary)" }}>{u.username}</td>
+                          <td style={{ textAlign: "center", fontWeight: "var(--fw-bold)" }}>#{u.id}</td>
+                          <td style={{ fontWeight: "var(--fw-bold)", color: "var(--brand-primary)" }}>{u.username}</td>
                           <td>{u.email}</td>
                           <td>{u.role}</td>
                           <td><span className="status-pill pill-cukup">{u.status}</span></td>
@@ -1117,15 +1117,15 @@ function TablePager({ page, totalPages, total, start, count, onPage }: { page: n
 function Row({ label, value, valueColor }: { label: string; value: React.ReactNode; valueColor?: string }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", borderBottom: "1px solid var(--border-color)", paddingBottom: 4 }}>
-      <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>{label}</span>
-      <span style={{ fontWeight: 700, textAlign: "right", maxWidth: "60%", color: valueColor }}>{value}</span>
+      <span style={{ color: "var(--text-muted)", fontWeight: "var(--fw-semibold)" }}>{label}</span>
+      <span style={{ fontWeight: "var(--fw-bold)", textAlign: "right", maxWidth: "60%", color: valueColor }}>{value}</span>
     </div>
   );
 }
 
 function SkuViewModal({ sku, onClose, t }: { sku: EnrichedSku; onClose: () => void; t: (k: keyof Dict) => string }) {
   const heading = (txt: string) => (
-    <h3 style={{ fontSize: "0.95rem", fontWeight: 800, textTransform: "uppercase", color: "var(--brand-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 6 }}>{txt}</h3>
+    <h3 style={{ fontSize: "0.95rem", fontWeight: "var(--fw-strong)", textTransform: "uppercase", color: "var(--brand-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 6 }}>{txt}</h3>
   );
   return (
     <div className="modal-overlay show">
@@ -1154,12 +1154,12 @@ function SkuViewModal({ sku, onClose, t }: { sku: EnrichedSku; onClose: () => vo
           </div>
         </div>
         <div>
-          <h3 style={{ fontSize: "0.95rem", fontWeight: 800, textTransform: "uppercase", color: "var(--brand-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 6, marginBottom: 12 }}>Weekly Realization vs Forecast Trend</h3>
+          <h3 style={{ fontSize: "0.95rem", fontWeight: "var(--fw-strong)", textTransform: "uppercase", color: "var(--brand-primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 6, marginBottom: 12 }}>Weekly Realization vs Forecast Trend</h3>
           <table className="modern-data-table" style={{ minWidth: "100%", border: "1px solid var(--border-color)" }}>
             <thead><tr style={{ background: "var(--bg-body)" }}><th style={{ textAlign: "center" }}>Metric</th>{[1,2,3,4,5].map((w) => <th key={w} style={{ textAlign: "center" }}>W{w}</th>)}</tr></thead>
             <tbody>
-              <tr><td style={{ fontWeight: 700 }}>Forecast Target</td>{sku.f_trend.slice(0,5).map((v, i) => <td key={i} style={{ textAlign: "right", fontFamily: "monospace" }}>{v.toLocaleString()}</td>)}</tr>
-              <tr><td style={{ fontWeight: 700, color: "var(--brand-primary)" }}>Actual Realization</td>{sku.r_trend.slice(0,5).map((v, i) => <td key={i} style={{ textAlign: "right", color: "var(--brand-primary)", fontFamily: "monospace", fontWeight: 700 }}>{v.toLocaleString()}</td>)}</tr>
+              <tr><td style={{ fontWeight: "var(--fw-bold)" }}>Forecast Target</td>{sku.f_trend.slice(0,5).map((v, i) => <td key={i} style={{ textAlign: "right", fontFamily: "monospace" }}>{v.toLocaleString()}</td>)}</tr>
+              <tr><td style={{ fontWeight: "var(--fw-bold)", color: "var(--brand-primary)" }}>Actual Realization</td>{sku.r_trend.slice(0,5).map((v, i) => <td key={i} style={{ textAlign: "right", color: "var(--brand-primary)", fontFamily: "monospace", fontWeight: "var(--fw-bold)" }}>{v.toLocaleString()}</td>)}</tr>
             </tbody>
           </table>
         </div>
@@ -1190,7 +1190,7 @@ function BatchModal({ skuName, batches, onClose, onAdd, onDelete, onInvalid, onA
           <div className="modal-title"><i className="ph-fill ph-clock-counter-clockwise" style={{ color: "var(--brand-primary)" }} /> <span>{t("batch_fifo_details")}</span></div>
           <button className="close-btn" onClick={onClose}><i className="ph ph-x" /></button>
         </div>
-        <div style={{ marginBottom: 16, fontWeight: 700, color: "var(--brand-primary)" }}>{skuName}</div>
+        <div style={{ marginBottom: 16, fontWeight: "var(--fw-bold)", color: "var(--brand-primary)" }}>{skuName}</div>
         <form onSubmit={(e) => {
           e.preventDefault();
           const f = e.currentTarget;
@@ -1202,7 +1202,7 @@ function BatchModal({ skuName, batches, onClose, onAdd, onDelete, onInvalid, onA
           f.reset();
           onAdded();
         }} style={{ background: "var(--bg-body)", padding: 16, borderRadius: 12, marginBottom: 24, border: "1px solid var(--border-color)" }}>
-          <div style={{ fontSize: "0.85rem", fontWeight: 700, marginBottom: 12 }}><i className="ph ph-plus-circle" /> <span>{t("add_inc_batch")}</span></div>
+          <div style={{ fontSize: "0.85rem", fontWeight: "var(--fw-bold)", marginBottom: 12 }}><i className="ph ph-plus-circle" /> <span>{t("add_inc_batch")}</span></div>
           <div className="form-grid" style={{ marginBottom: 0 }}>
             <div className="form-group"><label className="form-label">{t("inc_date")}</label><input name="b_date" type="date" className="form-input" required /></div>
             <div className="form-group"><label className="form-label">{t("inc_qty")}</label><input name="b_qty_in" type="number" className="form-input" required min={1} /></div>
@@ -1221,7 +1221,7 @@ function BatchModal({ skuName, batches, onClose, onAdd, onDelete, onInvalid, onA
                   <td>{b.date}</td>
                   <td style={{ textAlign: "right" }}>{b.qty_in.toLocaleString()}</td>
                   <td style={{ textAlign: "right" }}>{b.qty_used.toLocaleString()}</td>
-                  <td style={{ textAlign: "right", ...(b.sisa === 0 ? { color: "var(--text-muted)", textDecoration: "line-through" } : { color: "var(--brand-primary)", fontWeight: 800 }) }}>{b.sisa.toLocaleString()}</td>
+                  <td style={{ textAlign: "right", ...(b.sisa === 0 ? { color: "var(--text-muted)", textDecoration: "line-through" } : { color: "var(--brand-primary)", fontWeight: "var(--fw-strong)" }) }}>{b.sisa.toLocaleString()}</td>
                   <td style={{ textAlign: "center" }}><button className="btn-icon danger" style={{ width: 24, height: 24 }} onClick={() => onDelete(b.id)} title="Delete Batch"><i className="ph ph-trash" /></button></td>
                 </tr>
               ))}

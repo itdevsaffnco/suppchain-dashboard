@@ -37,9 +37,10 @@ ChartJS.register(
 );
 
 // Canvas can't resolve CSS variables, so read the computed body font
-// (next/font registers hashed family names) to keep charts on DM Sans.
+// (next/font registers hashed family names) to keep charts on Special Gothic.
 if (typeof window !== "undefined") {
   ChartJS.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  ChartJS.defaults.font.weight = 500;
 }
 
 const numberFmt = (v: number) => v.toLocaleString();
@@ -139,7 +140,7 @@ export function ComboChart({ labels, forecast, realization, lineColor, theme, hi
             backgroundColor: theme.labelBg,
             borderRadius: 4,
             color: lineColor,
-            font: { weight: "bold" as const, size: 10 },
+            font: { weight: 600 as const, size: 10 },
             formatter: (v: number) => (hideZeroLabels ? (v > 0 ? numberFmt(v) : "") : numberFmt(v)),
           },
         },
@@ -286,7 +287,7 @@ export function DoughnutChart({ labels, data, colors, theme }: DoughnutProps) {
         datalabels: {
           display: true,
           color: "#FFFFFF",
-          font: { weight: "bold", size: 11 },
+          font: { weight: 600, size: 11 },
           formatter: (v: number) => (v > 0 ? numberFmt(v) : ""),
         },
       },
