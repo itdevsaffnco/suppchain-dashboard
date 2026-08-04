@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# dependencies (npm workspaces hoist everything to the root)
 /node_modules
+apps/*/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -14,8 +15,8 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+apps/web/.next/
+apps/web/out/
 
 # production
 /build
@@ -30,8 +31,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — the .example templates are committed on purpose
+.env
+.env.*
+!.env.example
+!apps/*/.env.example
 
 # vercel
 .vercel
