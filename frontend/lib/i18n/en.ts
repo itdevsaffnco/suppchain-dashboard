@@ -30,6 +30,7 @@ const en = {
   nav_health: "Stock Health",
   nav_aging: "Aging Stock",
   nav_users: "Users",
+  nav_accounts: "Account Management",
   ui_theme: "UI Theme Setting",
   theme_blue: "Default Enterprise (Blue)",
   theme_dark: "Midnight (Dark Mode)",

@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'sheets' => [
+        'webapp_url' => env('SHEETS_WEBAPP_URL'),
+    ],
+
 ];

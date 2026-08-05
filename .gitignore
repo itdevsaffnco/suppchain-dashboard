@@ -1,8 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies (npm workspaces hoist everything to the root)
+# dependencies
 /node_modules
-apps/*/node_modules
+frontend/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,11 +15,19 @@ apps/*/node_modules
 /coverage
 
 # next.js
-apps/web/.next/
-apps/web/out/
+frontend/.next/
+frontend/out/
 
 # production
 /build
+
+# Laravel
+backend/vendor/
+backend/storage/logs/*.log
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/*.php
 
 # misc
 .DS_Store
@@ -35,7 +43,8 @@ yarn-error.log*
 .env
 .env.*
 !.env.example
-!apps/*/.env.example
+!frontend/.env.example
+!backend/.env.example
 
 # vercel
 .vercel

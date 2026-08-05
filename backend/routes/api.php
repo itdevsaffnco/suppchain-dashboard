@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SheetWebhookController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ Route::middleware('app-key')->group(function () {
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::get('/auth/reset-password', [AuthController::class, 'checkResetToken']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+    // Webhook dari Google Apps Script onEdit
+    Route::post('/sheets/webhook', SheetWebhookController::class);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);

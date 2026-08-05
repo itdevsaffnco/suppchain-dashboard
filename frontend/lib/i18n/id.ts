@@ -32,6 +32,7 @@ const id: Dict = {
   nav_health: "Kesehatan Stok",
   nav_aging: "Umur Stok",
   nav_users: "Manajemen Pengguna",
+  nav_accounts: "Manajemen Akun",
   ui_theme: "Pengaturan Tema UI",
   theme_blue: "Korporat Bawaan (Biru)",
   theme_dark: "Gelap Malam (Mode Gelap)",

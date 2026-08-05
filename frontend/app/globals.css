@@ -155,9 +155,11 @@ body { background-color: var(--bg-body); color: var(--text-main); font-weight: v
 .logout-btn:hover { background: color-mix(in srgb, var(--brand-red) 10%, transparent); border-color: color-mix(in srgb, var(--brand-red) 40%, transparent); color: var(--brand-red); }
 
 /* --- Main Content & Tabs --- */
-.main-wrapper { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; padding-bottom: 40px; }
-.tab-content { display: none; padding: 28px; animation: fadeIn var(--dur-slow) var(--ease-smooth); max-width: 100%; }
-.tab-content.active { display: block; }
+.main-wrapper { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 0; }
+.tab-content { display: none; padding: 28px; animation: fadeIn var(--dur-slow) var(--ease-smooth); max-width: 100%; flex: 1; min-height: 0; overflow-y: auto; }
+.tab-content.active { display: flex; flex-direction: column; }
+.tab-content.active > .card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.tab-content.active > .card .table-responsive { flex: 1; overflow-y: auto; min-height: 0; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; flex-wrap: wrap; gap: 16px; }
 .header h1 { font-size: 1.5rem; font-weight: var(--fw-bold); color: var(--text-main); letter-spacing: -0.005em; }
@@ -346,5 +348,6 @@ tbody tr:hover td { background: var(--bg-subtle); }
   .user-info-box { flex: 1; }
   .logout-btn { width: auto; }
   .main-wrapper { overflow: visible; padding-bottom: 20px; }
+  .tab-content.active { display: block; }
   .weekly-grid { grid-template-columns: repeat(3, 1fr); }
 }

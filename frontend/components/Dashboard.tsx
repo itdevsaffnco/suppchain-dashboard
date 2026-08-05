@@ -18,7 +18,7 @@ import { ComboChart, GroupedBarChart, SimpleBarChart, DoughnutChart } from "./ch
 import LiveWallpaper from "./LiveWallpaper";
 
 type Session = { username: string; role: "Admin" | "User" };
-type TabId = "dashboard" | "weekly" | "health" | "aging" | "settings";
+type TabId = "dashboard" | "weekly" | "health" | "aging" | "settings" | "accounts";
 
 const THEME_OPTIONS: { value: ThemeName; labelKey: keyof Dict; swatch: string }[] = [
   { value: "theme-default", labelKey: "theme_blue", swatch: "linear-gradient(135deg,#1E3A8A,#0EA5E9)" },
@@ -545,7 +545,17 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
   );
 
   // ---- Pagination (applies to every data page, not the dashboard) ----
-  const ROWS_PER_PAGE = 12;
+  const [ROWS_PER_PAGE, setRowsPerPage] = useState(12);
+  useEffect(() => {
+    const calc = () => {
+      // Estimasi: tinggi viewport dikurangi header/filter/pagination (~300px), dibagi tinggi baris (~44px)
+      const rows = Math.max(5, Math.floor((window.innerHeight - 300) / 44));
+      setRowsPerPage(rows);
+    };
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, []);
   const [weeklyPage, setWeeklyPage] = useState(1);
   const [healthPage, setHealthPage] = useState(1);
   const [agingPage, setAgingPage] = useState(1);
@@ -694,6 +704,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
         <div className={`nav-item ${tab === "aging" ? "active" : ""}`} onClick={() => setTab("aging")}><i className="ph ph-hourglass" /> <span>{t("nav_aging")}</span></div>
         <div className="nav-section-label">{t("general_label")}</div>
         <div className={`nav-item ${tab === "settings" ? "active" : ""}`} onClick={() => setTab("settings")}><i className="ph ph-gear-six" /> <span>{t("nav_settings")}</span></div>
+        {isAdmin && <div className={`nav-item ${tab === "accounts" ? "active" : ""}`} onClick={() => setTab("accounts")}><i className="ph ph-users-three" /> <span>{t("nav_accounts")}</span></div>}
 
         <div className="sidebar-footer">
           <div className="user-info-box">
@@ -1014,34 +1025,43 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
               </form>
             </div>
 
-            {/* User Management (admin only) */}
-            {isAdmin && (
-              <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-                <div className="card-header" style={{ padding: 20, marginBottom: 0 }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 8 }}><i className="ph-fill ph-users" /> <span>{t("user_management")}</span></span>
-                  <button className="btn btn-primary" onClick={() => setUserModalOpen(true)}><i className="ph ph-user-plus" /> <span>{t("create_new_user")}</span></button>
-                </div>
-                <div className="table-responsive">
-                  <table className="modern-data-table">
-                    <thead><tr><th style={{ width: 50 }}>ID</th><th>Username</th><th>{t("email_label")}</th><th>Role</th><th>Status</th><th style={{ width: 100 }}>{t("tbl_action")}</th></tr></thead>
-                    <tbody>
-                      {data?.users.map((u) => (
-                        <tr key={u.id}>
-                          <td style={{ fontWeight: "var(--fw-bold)" }}>#{u.id}</td>
-                          <td style={{ fontWeight: "var(--fw-bold)", color: "var(--brand-primary)" }}>{u.username}</td>
-                          <td>{u.email}</td>
-                          <td>{u.role}</td>
-                          <td><span className="status-pill pill-cukup">{u.status}</span></td>
-                          <td><button className="btn-icon danger" onClick={() => deleteUser(u.id, u.username)} title="Delete Account"><i className="ph ph-trash" /></button></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* ================= ACCOUNTS ================= */}
+        {isAdmin && (
+          <div className={`tab-content ${tab === "accounts" ? "active" : ""}`}>
+            <div className="header"><div><h1>{t("nav_accounts")}</h1><p>{t("user_management")}</p></div><DateBadge /></div>
+            <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+              <div className="card-header" style={{ padding: "20px 24px", marginBottom: 0 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}><i className="ph-fill ph-users-three" /> <span>{t("user_management")}</span></span>
+                <button className="btn btn-primary" onClick={() => setUserModalOpen(true)}><i className="ph ph-user-plus" /> <span>{t("create_new_user")}</span></button>
+              </div>
+              <div className="table-responsive">
+                <table className="modern-data-table">
+                  <thead><tr><th style={{ width: 50 }}>ID</th><th>Username</th><th>{t("email_label")}</th><th>Role</th><th>Status</th><th style={{ width: 100 }}>{t("tbl_action")}</th></tr></thead>
+                  <tbody>
+                    {data?.users.map((u) => (
+                      <tr key={u.id}>
+                        <td style={{ fontWeight: "var(--fw-bold)" }}>#{u.id}</td>
+                        <td style={{ fontWeight: "var(--fw-bold)", color: "var(--brand-primary)" }}>{u.username}</td>
+                        <td>{u.email}</td>
+                        <td>{u.role}</td>
+                        <td><span className="status-pill pill-cukup">{u.status}</span></td>
+                        <td>
+                          {u.username === session?.username
+                            ? <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>—</span>
+                            : <button className="btn-icon danger" onClick={() => deleteUser(u.id, u.username)} title="Delete Account"><i className="ph ph-trash" /></button>
+                          }
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ================= MODALS ================= */}
