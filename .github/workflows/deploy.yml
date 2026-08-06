@@ -36,13 +36,7 @@ jobs:
             docker stop supplychain-dash_backend_app 2>/dev/null || true
             docker rm supplychain-dash_backend_app 2>/dev/null || true
             docker network create supplychain-dash-network 2>/dev/null || true
-            docker run -d \
-              --name supplychain-dash_backend_app \
-              --network supplychain-dash-network \
-              --restart unless-stopped \
-              -p 4020:4020 \
-              -e BACKEND_ENV="${{ secrets.BACKEND_ENV }}" \
-              ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
+            docker run -d --name supplychain-dash_backend_app --network supplychain-dash-network --restart unless-stopped -p 4020:4020 -e BACKEND_ENV="${{ secrets.BACKEND_ENV }}" ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
 
   deploy-frontend:
     runs-on: ubuntu-latest
@@ -76,11 +70,4 @@ jobs:
             docker stop supplychain-dash_frontend_app 2>/dev/null || true
             docker rm supplychain-dash_frontend_app 2>/dev/null || true
             docker network create supplychain-dash-network 2>/dev/null || true
-            docker run -d \
-              --name supplychain-dash_frontend_app \
-              --network supplychain-dash-network \
-              --restart unless-stopped \
-              -p 4021:4021 \
-              -e API_BASE_URL=http://supplychain-dash_backend_app:4020/api \
-              -e APP_API_KEY="${{ secrets.APP_API_KEY }}" \
-              ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
+            docker run -d --name supplychain-dash_frontend_app --network supplychain-dash-network --restart unless-stopped -p 4021:4021 -e API_BASE_URL=http://supplychain-dash_backend_app:4020/api -e APP_API_KEY="${{ secrets.APP_API_KEY }}" ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
