@@ -14,6 +14,9 @@ php artisan route:cache
 echo "[entrypoint] Running migrations..."
 php artisan migrate --force
 
+echo "[entrypoint] Seeding database..."
+php artisan db:seed --force
+
 echo "[entrypoint] Setting storage permissions..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
