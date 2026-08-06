@@ -36,6 +36,7 @@ Route::middleware('app-key')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::get('/users', [UserController::class, 'index']);
             Route::post('/users', [UserController::class, 'store']);
+            Route::patch('/users/{id}', [UserController::class, 'update'])->whereNumber('id');
             Route::delete('/users/{id}', [UserController::class, 'destroy'])->whereNumber('id');
         });
     });

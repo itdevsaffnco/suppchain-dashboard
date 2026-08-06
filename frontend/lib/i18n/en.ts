@@ -165,6 +165,11 @@ const en = {
   user_not_found: "User not found.",
   menu_label: "Menu",
   general_label: "General",
+  edit_user: "Edit User",
+  update_account: "Update Account",
+  user_updated: "User account updated successfully.",
+  optional_new_password: "New Password (optional)",
+  leave_blank_keep: "Leave blank to keep current password",
 };
 
 export default en;

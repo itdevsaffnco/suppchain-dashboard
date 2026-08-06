@@ -64,6 +64,62 @@ class UserController extends Controller
         return response()->json(['user' => $user->toDashboardArray()]);
     }
 
+    /** PATCH /api/users/{id} */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return response()->json(['error' => 'user_not_found'], 404);
+        }
+
+        try {
+            $data = $request->validate([
+                'username' => ['required', 'string'],
+                'email' => ['required', 'string'],
+                'role' => ['nullable', 'string'],
+                'password' => ['nullable', 'string'],
+            ]);
+        } catch (ValidationException) {
+            return response()->json(['error' => 'missing_fields'], 400);
+        }
+
+        $username = trim($data['username']);
+        $email = trim($data['email']);
+
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['error' => 'email_invalid'], 400);
+        }
+
+        if (isset($data['password']) && mb_strlen($data['password']) < self::MIN_PASSWORD) {
+            return response()->json(['error' => 'password_too_short'], 400);
+        }
+
+        // Check if username/email already taken by another user
+        $exists = User::where('id', '!=', $id)
+            ->where(function ($q) use ($username, $email) {
+                $q->whereRaw('LOWER(username) = ?', [mb_strtolower($username)])
+                    ->orWhereRaw('LOWER(email) = ?', [mb_strtolower($email)]);
+            })
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['error' => 'user_exists'], 409);
+        }
+
+        $user->username = $username;
+        $user->email = $email;
+        $user->role = ($data['role'] ?? null) === 'Admin' ? 'Admin' : 'User';
+
+        if (isset($data['password'])) {
+            $user->password = $data['password'];
+        }
+
+        $user->save();
+
+        return response()->json(['user' => $user->toDashboardArray()]);
+    }
+
     /** DELETE /api/users/{id} */
     public function destroy(Request $request, int $id): JsonResponse
     {

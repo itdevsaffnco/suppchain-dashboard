@@ -246,6 +246,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
 
   // --- modals -------------------------------------------------------------
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [editUserData, setEditUserData] = useState<AppUser | null>(null);
   const [skuView, setSkuView] = useState<EnrichedSku | null>(null);
   const [batchSku, setBatchSku] = useState<string | null>(null);
 
@@ -375,6 +376,23 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
       showToast("User account deleted.", "warning");
     } catch {
       showToast(t("user_not_found"), "error");
+    }
+  };
+  const updateUser = async (u: { id: number; username: string; email: string; role: AppUser["role"]; password?: string }): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(u),
+      });
+      const json = await res.json();
+      if (!res.ok) { showToast(t((json.error as keyof Dict) || "missing_fields"), "error"); return false; }
+      setData((prev) => prev ? { ...prev, users: prev.users.map((usr) => usr.id === u.id ? json.user as AppUser : usr) } : prev);
+      showToast(t("user_updated"), "success");
+      return true;
+    } catch {
+      showToast(t("missing_fields"), "error");
+      return false;
     }
   };
 
@@ -1051,7 +1069,10 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                         <td>
                           {u.username === session?.username
                             ? <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>—</span>
-                            : <button className="btn-icon danger" onClick={() => deleteUser(u.id, u.username)} title="Delete Account"><i className="ph ph-trash" /></button>
+                            : <div style={{ display: "flex", gap: 4 }}>
+                                <button className="btn-icon" onClick={() => setEditUserData(u)} title="Edit Account"><i className="ph ph-pencil" /></button>
+                                <button className="btn-icon danger" onClick={() => deleteUser(u.id, u.username)} title="Delete Account"><i className="ph ph-trash" /></button>
+                              </div>
                           }
                         </td>
                       </tr>
@@ -1077,6 +1098,23 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 <div className="form-group"><label className="form-label">{t("access_role")}</label><select name="u_role" className="form-input" defaultValue="User"><option value="User">{t("role_user")}</option><option value="Admin">{t("role_admin")}</option></select></div>
               </div>
               <div className="modal-footer"><button type="button" className="btn btn-outline" onClick={() => setUserModalOpen(false)}>{t("cancel")}</button><button type="submit" className="btn btn-primary"><i className="ph ph-floppy-disk" /> <span>{t("save_account")}</span></button></div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editUserData && (
+        <div className="modal-overlay show">
+          <div className="modal-content">
+            <div className="modal-header"><div className="modal-title">{t("edit_user")}</div><button className="close-btn" onClick={() => setEditUserData(null)}><i className="ph ph-x" /></button></div>
+            <form onSubmit={async (e) => { e.preventDefault(); const f = e.currentTarget; const pwd = (f.elements.namedItem("e_password") as HTMLInputElement).value; const ok = await updateUser({ id: editUserData.id, username: (f.elements.namedItem("e_username") as HTMLInputElement).value, email: (f.elements.namedItem("e_email") as HTMLInputElement).value, role: (f.elements.namedItem("e_role") as HTMLSelectElement).value as "Admin" | "User", ...(pwd ? { password: pwd } : {}) }); if (ok) setEditUserData(null); }}>
+              <div className="form-grid" style={{ gridTemplateColumns: "1fr" }}>
+                <div className="form-group"><label className="form-label">Username</label><input name="e_username" className="form-input" required defaultValue={editUserData.username} placeholder="Enter username" /></div>
+                <div className="form-group"><label className="form-label">{t("email_label")}</label><input name="e_email" type="email" className="form-input" required defaultValue={editUserData.email} placeholder="user@company.com" /></div>
+                <div className="form-group"><label className="form-label">{t("optional_new_password")}</label><input name="e_password" type="password" className="form-input" minLength={6} placeholder={t("leave_blank_keep")} /></div>
+                <div className="form-group"><label className="form-label">{t("access_role")}</label><select name="e_role" className="form-input" defaultValue={editUserData.role}><option value="User">{t("role_user")}</option><option value="Admin">{t("role_admin")}</option></select></div>
+              </div>
+              <div className="modal-footer"><button type="button" className="btn btn-outline" onClick={() => setEditUserData(null)}>{t("cancel")}</button><button type="submit" className="btn btn-primary"><i className="ph ph-floppy-disk" /> <span>{t("update_account")}</span></button></div>
             </form>
           </div>
         </div>

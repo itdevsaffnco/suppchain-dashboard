@@ -167,6 +167,11 @@ const id: Dict = {
   user_not_found: "Pengguna tidak ditemukan.",
   menu_label: "Menu",
   general_label: "Umum",
+  edit_user: "Edit Pengguna",
+  update_account: "Perbarui Akun",
+  user_updated: "Akun pengguna berhasil diperbarui.",
+  optional_new_password: "Kata Sandi Baru (opsional)",
+  leave_blank_keep: "Kosongkan untuk tetap pakai kata sandi saat ini",
 };
 
 export default id;

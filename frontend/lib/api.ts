@@ -13,7 +13,7 @@ export interface ApiResult<T> {
 }
 
 interface ApiRequest {
-  method?: "GET" | "POST" | "DELETE";
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
   /** Sanctum personal access token for endpoints that need a signed-in user. */
   token?: string;

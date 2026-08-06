@@ -57,6 +57,41 @@ export async function POST(request: Request) {
   });
 }
 
+// PATCH { id, username, email, role, password? } — update a user (admin only).
+export async function PATCH(request: Request) {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
+  let body: { id?: number; username?: string; email?: string; role?: string; password?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const id = Number(body.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json({ error: "missing_fields" }, { status: 400 });
+  }
+
+  const payload: Record<string, string> = {
+    username: (body.username || "").trim(),
+    email: (body.email || "").trim(),
+    role: body.role === "Admin" ? "Admin" : "User",
+  };
+  if (body.password) payload.password = body.password;
+
+  const res = await apiFetch<{ user: AppUser } | { error: string }>(`/users/${id}`, {
+    method: "PATCH",
+    token: auth.session.apiToken,
+    body: payload,
+  });
+
+  return NextResponse.json(res.data ?? { error: "missing_fields" }, {
+    status: res.ok ? 200 : res.status,
+  });
+}
+
 // DELETE ?id=… — remove a user (admin only, not yourself).
 export async function DELETE(request: Request) {
   const auth = await requireAdmin();
