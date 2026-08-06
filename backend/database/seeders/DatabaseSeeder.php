@@ -55,13 +55,15 @@ class DatabaseSeeder extends Seeder
         $defaultPassword = bcrypt((string) env('SEED_USER_PASSWORD', 'saffnco123'));
 
         foreach ($users as $user) {
+            $existingUser = User::where('username', $user['username'])->first();
+
             User::updateOrCreate(
                 ['username' => $user['username']],
                 [
                     'email' => $user['email'],
                     'role' => $user['role'],
                     'status' => $user['status'],
-                    'password' => $defaultPassword,
+                    'password' => $existingUser ? $existingUser->password : $defaultPassword,
                 ],
             );
         }
