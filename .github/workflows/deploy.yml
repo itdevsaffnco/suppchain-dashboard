@@ -1,0 +1,92 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: |
+      contains(toJson(github.event.commits.*.modified + github.event.commits.*.added + github.event.commits.*.removed), 'backend/')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
+
+      - name: Deploy Backend to Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker stop supplychain-dash_backend_app 2>/dev/null || true
+            docker rm supplychain-dash_backend_app 2>/dev/null || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
+            docker network create supplychain-dash-network 2>/dev/null || true
+            docker run -d \
+              --name supplychain-dash_backend_app \
+              --network supplychain-dash-network \
+              --restart unless-stopped \
+              -p 4020:4020 \
+              -e BACKEND_ENV="${{ secrets.BACKEND_ENV }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: |
+      contains(toJson(github.event.commits.*.modified + github.event.commits.*.added + github.event.commits.*.removed), 'frontend/')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
+
+      - name: Deploy Frontend to Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker stop supplychain-dash_frontend_app 2>/dev/null || true
+            docker rm supplychain-dash_frontend_app 2>/dev/null || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
+            docker network create supplychain-dash-network 2>/dev/null || true
+            docker run -d \
+              --name supplychain-dash_frontend_app \
+              --network supplychain-dash-network \
+              --restart unless-stopped \
+              -p 4021:4021 \
+              -e API_BASE_URL=http://supplychain-dash_backend_app:4020/api \
+              -e APP_API_KEY="${{ secrets.BACKEND_ENV }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
