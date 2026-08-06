@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
     {
         // The seed users carried no password (demo mode accepted anything), so
         // they get a documented default that must be changed after first login.
-        $defaultPassword = (string) env('SEED_USER_PASSWORD', 'saffnco123');
+        $defaultPassword = bcrypt((string) env('SEED_USER_PASSWORD', 'saffnco123'));
 
         foreach ($users as $user) {
             User::updateOrCreate(
