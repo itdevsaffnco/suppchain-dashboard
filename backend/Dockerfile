@@ -45,7 +45,7 @@ WORKDIR /var/www/html
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
 
-RUN mkdir -p /var/log/php \
+RUN mkdir -p /var/log/php /var/log/supervisor \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
