@@ -10,7 +10,6 @@ php artisan package:discover --ansi
 echo "[entrypoint] Caching config & routes..."
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
 
 echo "[entrypoint] Running migrations..."
 php artisan migrate --force
