@@ -1,12 +1,12 @@
 # ── Stage 1: Composer dependencies ──────────────────────────────────────────
 FROM composer:2 AS vendor
 WORKDIR /app
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock artisan ./
 RUN composer install \
     --no-dev \
     --no-interaction \
     --no-progress \
-    --optimize-autoloader \
+    --no-scripts \
     --ignore-platform-reqs
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────────────────

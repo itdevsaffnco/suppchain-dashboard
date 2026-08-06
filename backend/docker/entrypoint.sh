@@ -4,6 +4,9 @@ set -e
 echo "[entrypoint] Writing .env from BACKEND_ENV..."
 printf '%s' "$BACKEND_ENV" > /var/www/html/.env
 
+echo "[entrypoint] Discovering packages..."
+php artisan package:discover --ansi
+
 echo "[entrypoint] Caching config & routes..."
 php artisan config:cache
 php artisan route:cache
