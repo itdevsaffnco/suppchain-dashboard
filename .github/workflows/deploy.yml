@@ -24,6 +24,8 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
+        env:
+          DOCKER_BUILDKIT: 1
 
   build-backend:
     name: Build Backend
@@ -44,6 +46,8 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_backend_app:latest
+        env:
+          DOCKER_BUILDKIT: 1
 
   deploy:
     name: Deploy to Container Server
@@ -71,15 +75,20 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           APP_API_KEY: ${{ secrets.APP_API_KEY }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           DOCKER_IMAGE_FRONTEND: ${{ secrets.DOCKERHUB_USERNAME }}/saffnco_supplychain-dash_frontend_app:latest
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: APP_API_KEY,DOCKER_IMAGE_FRONTEND
+          envs: APP_API_KEY,SESSION_SECRET,DOCKER_IMAGE_FRONTEND
           script: |
             docker pull "$DOCKER_IMAGE_FRONTEND"
             docker stop supplychain-dash_frontend_app 2>/dev/null || true
             docker rm supplychain-dash_frontend_app 2>/dev/null || true
             docker network create supplychain-dash-network 2>/dev/null || true
-            docker run -d --name supplychain-dash_frontend_app --network supplychain-dash-network --restart unless-stopped -p 4021:4021 -e API_BASE_URL=http://supplychain-dash_backend_app:4020/api -e APP_API_KEY="$APP_API_KEY" "$DOCKER_IMAGE_FRONTEND"
+            docker run -d --name supplychain-dash_frontend_app --network supplychain-dash-network --restart unless-stopped -p 4021:4021 \
+              -e API_BASE_URL=http://supplychain-dash_backend_app:4020/api \
+              -e APP_API_KEY="$APP_API_KEY" \
+              -e SESSION_SECRET="$SESSION_SECRET" \
+              "$DOCKER_IMAGE_FRONTEND"
