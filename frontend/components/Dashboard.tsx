@@ -743,14 +743,16 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
       {/* Sidebar */}
       <div className="sidebar">
         <div className="brand"><i className="ph-fill ph-compass" /> <span className="side-label">Supply Chain Dashboard</span></div>
-        <div className="nav-section-label">{t("menu_label")}</div>
-        <div className={`nav-item ${tab === "dashboard" ? "active" : ""}`} onClick={() => setTab("dashboard")}><i className="ph ph-chart-line" /> <span>{t("nav_dashboard")}</span></div>
-        <div className={`nav-item ${tab === "weekly" ? "active" : ""}`} onClick={() => setTab("weekly")}><i className="ph ph-calendar" /> <span>{t("nav_weekly")}</span></div>
-        <div className={`nav-item ${tab === "health" ? "active" : ""}`} onClick={() => setTab("health")}><i className="ph ph-shield-check" /> <span>{t("nav_health")}</span></div>
-        <div className={`nav-item ${tab === "aging" ? "active" : ""}`} onClick={() => setTab("aging")}><i className="ph ph-hourglass" /> <span>{t("nav_aging")}</span></div>
-        <div className="nav-section-label">{t("general_label")}</div>
-        <div className={`nav-item ${tab === "settings" ? "active" : ""}`} onClick={() => setTab("settings")}><i className="ph ph-gear-six" /> <span>{t("nav_settings")}</span></div>
-        {isAdmin && <div className={`nav-item ${tab === "accounts" ? "active" : ""}`} onClick={() => setTab("accounts")}><i className="ph ph-users-three" /> <span>{t("nav_accounts")}</span></div>}
+        <div className="nav-items">
+          <div className="nav-section-label">{t("menu_label")}</div>
+          <div className={`nav-item ${tab === "dashboard" ? "active" : ""}`} onClick={() => setTab("dashboard")}><i className="ph ph-chart-line" /> <span>{t("nav_dashboard")}</span></div>
+          <div className={`nav-item ${tab === "weekly" ? "active" : ""}`} onClick={() => setTab("weekly")}><i className="ph ph-calendar" /> <span>{t("nav_weekly")}</span></div>
+          <div className={`nav-item ${tab === "health" ? "active" : ""}`} onClick={() => setTab("health")}><i className="ph ph-shield-check" /> <span>{t("nav_health")}</span></div>
+          <div className={`nav-item ${tab === "aging" ? "active" : ""}`} onClick={() => setTab("aging")}><i className="ph ph-hourglass" /> <span>{t("nav_aging")}</span></div>
+          <div className="nav-section-label">{t("general_label")}</div>
+          <div className={`nav-item ${tab === "settings" ? "active" : ""}`} onClick={() => setTab("settings")}><i className="ph ph-gear-six" /> <span>{t("nav_settings")}</span></div>
+          {isAdmin && <div className={`nav-item ${tab === "accounts" ? "active" : ""}`} onClick={() => setTab("accounts")}><i className="ph ph-users-three" /> <span>{t("nav_accounts")}</span></div>}
+        </div>
 
         <div className="sidebar-footer">
           <div className="user-info-box">
@@ -1222,7 +1224,7 @@ function SkuViewModal({ sku, onClose, t }: { sku: EnrichedSku; onClose: () => vo
           <div className="modal-title" style={{ display: "flex", alignItems: "center", gap: 8 }}><i className="ph-fill ph-info" style={{ color: "var(--brand-primary)", fontSize: "1.5rem" }} /> <span>{t("sku_det_profile")}</span></div>
           <button className="close-btn" onClick={onClose}><i className="ph ph-x" /></button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24, marginBottom: 24 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {heading("SKU Specifications")}
             <Row label="Name:" value={sku.name} />
