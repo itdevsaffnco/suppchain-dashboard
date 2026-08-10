@@ -1,0 +1,9 @@
+{
+  "models": [{
+    "title": "AI Token",
+    "provider": "openai",
+    "model": "AP-Sonnet-Weekly",
+    "apiBase": "https://openagentic.id/api/v1",
+    "apiKey": "sk-05d6521d802e6a9aab48030bbef22dc2692a1e11ac8f9775d9b43d912182994b"
+  }]
+}

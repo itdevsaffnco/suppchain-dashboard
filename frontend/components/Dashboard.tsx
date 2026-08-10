@@ -123,6 +123,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
   // --- login / logout -----------------------------------------------------
   const [loginError, setLoginError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -675,7 +676,34 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
                 <p>{t("login_desc")}</p>
                 <form onSubmit={handleLogin}>
                   <input name="username" type="text" className="login-input" placeholder={t("username_or_email_label")} required />
-                  <input name="password" type="password" className="login-input" placeholder={t("password_label")} required />
+                  <div style={{ position: "relative" }}>
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      className="login-input"
+                      style={{ paddingRight: 40 }}
+                      placeholder={t("password_label")}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      style={{
+                        position: "absolute",
+                        right: 12,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "var(--text-muted)",
+                        padding: 4,
+                      }}
+                      tabIndex={-1}
+                    >
+                      <i className={`ph ph-${showPassword ? "eye-slash" : "eye"}`} style={{ fontSize: "1.1rem" }} />
+                    </button>
+                  </div>
                   {loginError && <p style={{ color: "var(--brand-red)", marginBottom: 12, fontSize: "0.85rem" }}>{loginError}</p>}
                   <button type="submit" className="login-btn" disabled={loggingIn}>{loggingIn ? "…" : t("secure_login")}</button>
                 </form>
