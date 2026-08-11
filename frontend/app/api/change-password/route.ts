@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const currentPassword = body.currentPassword || "";
   const newPassword = body.newPassword || "";
   if (!currentPassword) return NextResponse.json({ error: "login_error" }, { status: 400 });
-  if (newPassword.length < 6) {
+  if (newPassword.length < 8) {
     return NextResponse.json({ error: "password_too_short" }, { status: 400 });
   }
 

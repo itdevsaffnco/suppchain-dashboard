@@ -200,7 +200,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
     const current = (form.elements.namedItem("current") as HTMLInputElement).value;
     const next = (form.elements.namedItem("next") as HTMLInputElement).value;
     const confirm = (form.elements.namedItem("confirm") as HTMLInputElement).value;
-    if (next.length < 6) { showToast(t("password_too_short"), "error"); return; }
+    if (next.length < 8) { showToast(t("password_too_short"), "error"); return; }
     if (next !== confirm) { showToast(t("password_mismatch"), "error"); return; }
     setChangingPw(true);
     try {

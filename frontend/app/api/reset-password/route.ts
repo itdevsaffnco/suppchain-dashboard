@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const token = body.token || "";
   const newPassword = body.newPassword || "";
-  if (newPassword.length < 6) {
+  if (newPassword.length < 8) {
     return NextResponse.json({ error: "password_too_short" }, { status: 400 });
   }
 

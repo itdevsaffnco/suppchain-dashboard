@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotRegisteredMail;
+use App\Mail\ResetPasswordMail;
 use App\Models\PasswordReset;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
     /** Minimum password length, mirrored by the frontend's validation. */
-    private const MIN_PASSWORD = 6;
+    private const MIN_PASSWORD = 8;
 
     /**
      * POST /api/auth/login — the identifier may be a username or an email.
@@ -90,30 +93,33 @@ class AuthController extends Controller
     }
 
     /**
-     * POST /api/auth/forgot-password — issues a reset token.
+     * POST /api/auth/forgot-password — issues a reset token and sends the email.
      *
      * Responds the same way whether or not the email exists so the endpoint
-     * can't be used to enumerate accounts. The token is returned to the
-     * Next.js server, which composes the link and sends the email; it is
-     * never forwarded to the browser.
+     * can't be used to enumerate accounts.
      */
     public function forgotPassword(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'email' => ['required', 'string'],
+            'email' => ['required', 'string', 'email'],
         ]);
 
-        $user = User::whereRaw('LOWER(email) = ?', [mb_strtolower(trim($data['email']))])->first();
+        $email = mb_strtolower(trim($data['email']));
+        $user  = User::whereRaw('LOWER(email) = ?', [$email])->first();
+
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 
         if (! $user || ! $user->isActive()) {
+            // Always send an email so the endpoint can't enumerate accounts.
+            Mail::to($data['email'])->send(new NotRegisteredMail($data['email']));
+
             return response()->json(['ok' => true]);
         }
 
-        return response()->json([
-            'ok' => true,
-            'token' => PasswordReset::issueFor($user),
-            'email' => $user->email,
-        ]);
+        $resetUrl = $frontendUrl . '/reset-password?token=' . PasswordReset::issueFor($user);
+        Mail::to($user->email)->send(new ResetPasswordMail($resetUrl, $user->email));
+
+        return response()->json(['ok' => true]);
     }
 
     /** GET /api/auth/reset-password?token=… — validates a link on page load. */

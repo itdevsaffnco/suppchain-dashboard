@@ -18,8 +18,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('app-key')->group(function () {
-    Route::post('/auth/login', [AuthController::class, 'login']);
-    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    // Max 10 attempts per minute per IP to slow down brute-force & email spam.
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/auth/login', [AuthController::class, 'login']);
+        Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    });
     Route::get('/auth/reset-password', [AuthController::class, 'checkResetToken']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
