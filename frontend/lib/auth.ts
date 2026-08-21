@@ -4,11 +4,24 @@ import { Role, Session, SessionUser } from "./types";
 const SESSION_COOKIE = "scm_session";
 const SESSION_TTL = "8h";
 
-function getSecret() {
+/** HS256 keys shorter than this are too weak to sign session cookies with. */
+const MIN_SECRET_LENGTH = 32;
+
+/**
+ * There is deliberately no fallback secret: a guessable key would let anyone
+ * forge an Admin session cookie (and the Laravel token it carries). A missing
+ * or weak SESSION_SECRET is a deployment error, so we fail loudly instead.
+ */
+function getSecret(): Uint8Array {
   const secret = process.env.SESSION_SECRET;
-  if (secret) return new TextEncoder().encode(secret);
-  // Fallback for dev/preview environments without SESSION_SECRET configured
-  return new TextEncoder().encode("dev-insecure-secret-change-me");
+
+  if (!secret || secret.length < MIN_SECRET_LENGTH) {
+    throw new Error(
+      `SESSION_SECRET must be set to at least ${MIN_SECRET_LENGTH} characters`
+    );
+  }
+
+  return new TextEncoder().encode(secret);
 }
 
 /**
@@ -26,8 +39,12 @@ export async function createSessionToken(user: SessionUser, apiToken: string): P
 }
 
 export async function verifySessionToken(token: string): Promise<Session | null> {
+  // Resolved outside the try so a misconfigured secret surfaces as a real
+  // error rather than being swallowed into a silent "not signed in".
+  const secret = getSecret();
+
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, secret);
     if (!payload.sub || !payload.role || !payload.apiToken) return null;
     return {
       username: payload.sub as string,

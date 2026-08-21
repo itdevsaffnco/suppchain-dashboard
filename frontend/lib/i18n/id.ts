@@ -157,7 +157,7 @@ const id: Dict = {
   confirm_password: "Konfirmasi Kata Sandi Baru",
   update_password: "Perbarui Kata Sandi",
   password_mismatch: "Kata sandi baru tidak cocok.",
-  password_too_short: "Kata sandi minimal 6 karakter.",
+  password_too_short: "Kata sandi minimal 8 karakter.",
   password_updated: "Kata sandi berhasil diperbarui.",
   user_management: "Manajemen Pengguna",
   user_exists: "Nama pengguna atau email sudah terdaftar.",

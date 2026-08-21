@@ -46,14 +46,19 @@ itu kunci yang dipakai Next.js untuk memanggil Laravel.
 
 ### Akun awal
 
-| Username   | Email                  | Role  | Password default |
-|------------|------------------------|-------|------------------|
-| `admin_sc` | admin@saffnco.com      | Admin | `saffnco123`     |
-| `staff_wh` | staff.wh@saffnco.com   | User  | `saffnco123`     |
+| Username   | Email                  | Role  |
+|------------|------------------------|-------|
+| `admin_sc` | admin@saffnco.com      | Admin |
+| `staff_wh` | staff.wh@saffnco.com   | User  |
 
 Login bisa pakai **username atau email**. Password tersimpan ter-hash (bcrypt)
-di MySQL — **ganti password default setelah login pertama**. Default-nya bisa
-diatur lewat `SEED_USER_PASSWORD` di `apps/api/.env` sebelum seeding.
+di MySQL.
+
+Seeder **tidak punya password default**. Sebelum seeding database baru, set
+`SEED_USER_PASSWORD` (minimal 8 karakter) di `apps/api/.env` — kalau kosong,
+seeding akan berhenti dengan error. Password ini hanya dipakai untuk akun yang
+baru dibuat; re-seeding tidak menimpa password user yang sudah ada.
+**Ganti password setelah login pertama.**
 
 ## Alur request
 
@@ -140,7 +145,7 @@ Semua butuh header `X-App-Key`; yang bertanda 🔒 juga butuh Bearer token.
 |---|---|
 | `API_BASE_URL` | Base URL Laravel (default `http://127.0.0.1:8000/api`) |
 | `APP_API_KEY` | Kunci bersama — harus sama dengan yang di `apps/api/.env` |
-| `SESSION_SECRET` | Wajib di production — secret JWT session cookie |
+| `SESSION_SECRET` | **Wajib** — secret JWT session cookie, minimal 32 karakter (`openssl rand -hex 32`). Tidak ada nilai fallback: app gagal start kalau kosong/terlalu pendek |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Email reset password. Tanpa ini, link reset ditampilkan di UI/console (mode dev) |
 
 **`apps/api/.env`**
@@ -149,7 +154,7 @@ Semua butuh header `X-App-Key`; yang bertanda 🔒 juga butuh Bearer token.
 |---|---|
 | `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Koneksi MySQL |
 | `APP_API_KEY` | Kunci bersama yang diverifikasi middleware `app-key` |
-| `SEED_USER_PASSWORD` | Password default user hasil seeding |
+| `SEED_USER_PASSWORD` | Password untuk user yang **baru dibuat** seeder (min. 8 karakter). Wajib saat seeding database baru — tanpa default |
 
 ## Catatan
 

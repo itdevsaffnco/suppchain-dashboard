@@ -155,7 +155,7 @@ const en = {
   confirm_password: "Confirm New Password",
   update_password: "Update Password",
   password_mismatch: "New passwords do not match.",
-  password_too_short: "Password must be at least 6 characters.",
+  password_too_short: "Password must be at least 8 characters.",
   password_updated: "Password updated successfully.",
   user_management: "User Management",
   user_exists: "Username or email is already registered.",

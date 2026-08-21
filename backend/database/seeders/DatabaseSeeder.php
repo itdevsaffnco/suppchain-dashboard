@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    /** Mirrors the app's minimum password length (AuthController::MIN_PASSWORD). */
+    private const MIN_SEED_PASSWORD = 8;
+
     /**
      * Seeds the dashboard's starting dataset.
      *
@@ -50,12 +53,17 @@ class DatabaseSeeder extends Seeder
      */
     private function seedUsers(array $users): void
     {
-        // The seed users carried no password (demo mode accepted anything), so
-        // they get a documented default that must be changed after first login.
-        $defaultPassword = bcrypt((string) env('SEED_USER_PASSWORD', 'saffnco123'));
+        // Hashed lazily: re-seeding an existing install keeps every stored
+        // password, so SEED_USER_PASSWORD is only required when this seeder
+        // actually has to create a brand-new account.
+        $defaultPassword = null;
 
         foreach ($users as $user) {
             $existingUser = User::where('username', $user['username'])->first();
+
+            if (! $existingUser && $defaultPassword === null) {
+                $defaultPassword = bcrypt($this->requireSeedPassword());
+            }
 
             User::updateOrCreate(
                 ['username' => $user['username']],
@@ -67,6 +75,25 @@ class DatabaseSeeder extends Seeder
                 ],
             );
         }
+    }
+
+    /**
+     * There is deliberately no default password: a documented one would give
+     * anyone who reads this repository a working login on every fresh install.
+     */
+    private function requireSeedPassword(): string
+    {
+        $password = (string) env('SEED_USER_PASSWORD', '');
+
+        if (mb_strlen($password) < self::MIN_SEED_PASSWORD) {
+            throw new \RuntimeException(
+                'SEED_USER_PASSWORD must be set to at least '
+                .self::MIN_SEED_PASSWORD
+                .' characters before seeding new users.'
+            );
+        }
+
+        return $password;
     }
 
     /**

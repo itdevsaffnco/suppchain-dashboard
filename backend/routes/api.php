@@ -19,12 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('app-key')->group(function () {
     // Max 10 attempts per minute per IP to slow down brute-force & email spam.
+    // Reset-password lives here too: without a throttle the 64-char token is
+    // open to brute forcing and the endpoint to abuse.
     Route::middleware('throttle:10,1')->group(function () {
         Route::post('/auth/login', [AuthController::class, 'login']);
         Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::get('/auth/reset-password', [AuthController::class, 'checkResetToken']);
+        Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
     });
-    Route::get('/auth/reset-password', [AuthController::class, 'checkResetToken']);
-    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
     // Webhook dari Google Apps Script onEdit
     Route::post('/sheets/webhook', SheetWebhookController::class);

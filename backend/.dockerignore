@@ -1,0 +1,20 @@
+# Keep secrets and local artefacts out of the build context.
+# The Dockerfile uses `COPY . .`, and the runtime .env is written by
+# docker/entrypoint.sh from BACKEND_ENV — it must never be baked into a layer.
+.env
+.env.*
+!.env.example
+
+vendor
+node_modules
+
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+
+.git
+.gitignore
+Dockerfile
+.dockerignore

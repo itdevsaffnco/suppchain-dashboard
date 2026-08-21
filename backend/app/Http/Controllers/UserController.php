@@ -9,7 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    private const MIN_PASSWORD = 6;
+    /** Minimum password length, mirrored by the frontend's validation. */
+    private const MIN_PASSWORD = 8;
 
     /** GET /api/users */
     public function index(): JsonResponse

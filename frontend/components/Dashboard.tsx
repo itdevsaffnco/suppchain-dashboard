@@ -742,7 +742,7 @@ export default function Dashboard({ initialSession }: { initialSession: Session 
 
       {/* Sidebar */}
       <div className="sidebar">
-        <div className="brand"><i className="ph-fill ph-compass" /> <span className="side-label">Supply Chain Dashboard</span></div>
+        <div className="brand"><i className="ph-fill ph-compass" /> <span className="side-label">Supply Chain<br/>Dashboard</span></div>
         <div className="nav-items">
           <div className="nav-section-label">{t("menu_label")}</div>
           <div className={`nav-item ${tab === "dashboard" ? "active" : ""}`} onClick={() => setTab("dashboard")}><i className="ph ph-chart-line" /> <span>{t("nav_dashboard")}</span></div>

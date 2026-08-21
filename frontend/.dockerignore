@@ -1,0 +1,19 @@
+# Keep secrets and local artefacts out of the build context.
+# The Dockerfile uses `COPY . .`, so without this file every .env (and the
+# credentials inside it) would be baked into the image layers.
+.env
+.env.*
+!.env.example
+
+node_modules
+.next
+out
+
+npm-debug.log*
+*.log
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+README.md
